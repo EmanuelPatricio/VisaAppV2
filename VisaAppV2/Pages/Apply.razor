@@ -1,0 +1,121 @@
+﻿@page "/apply"
+@using VisaAppV2.Data;
+
+<PageTitle>Apply for a visa</PageTitle>
+
+<PageProgress Visible Value="@percentage" />
+
+<LoadingIndicator @ref="loadingIndicator">
+    <EditForm Model="user" OnValidSubmit="OnValidSubmit">
+        <DataAnnotationsValidator />
+        <Microsoft.AspNetCore.Components.Forms.ValidationSummary />
+
+        <Fields>
+            <Field ColumnSize="ColumnSize.Is3">
+                <FieldLabel For="docType">Document type</FieldLabel>
+                <Select @bind-SelectedValue="user.DocumentType" id="docType">
+                    @foreach (var item in Enum.GetValues(typeof(Enums.DocumentType)))
+                    {
+                        <SelectItem Value="@item">@(Enum.GetName(typeof(Enums.DocumentType), item))</SelectItem>
+                    }
+                </Select>
+            </Field>
+            <Field ColumnSize="ColumnSize.Is9">
+                <FieldLabel For="docNumber">Document number</FieldLabel>
+                @if (user.DocumentType == Enums.DocumentType.ID)
+                {
+                    <InputMask @bind-Value="user.DocumentNumber"
+                               Mask="999-9999999-9"
+                               AutoUnmask="true"
+                               id="docNumber">
+                        <FieldHelp>Example: 123-4567890-1</FieldHelp>
+                    </InputMask>
+                }
+                else if (user.DocumentType == Enums.DocumentType.Passport)
+                {
+                    <InputMask @bind-Value="user.DocumentNumber"
+                               Mask="aa9999999"
+                               AutoUnmask="true"
+                               id="docNumber">
+                        <FieldHelp>Example: AB1234567</FieldHelp>
+                    </InputMask>
+                }
+                else
+                {
+                    <InputMask Disabled id="docNumber">
+                        <FieldHelp>Select a valid document type</FieldHelp>
+                    </InputMask>
+                }
+            </Field>
+        </Fields>
+
+        <Fields>
+            <Field>
+                <FieldLabel For="name">Name</FieldLabel>
+                <TextEdit @bind-Text="user.Name" id="name" />
+            </Field>
+            <Field>
+                <FieldLabel For="lastName">Last name</FieldLabel>
+                <TextEdit @bind-Text="user.LastName" id="lastName" />
+            </Field>
+        </Fields>
+
+        <Fields>
+            <Field>
+                <FieldLabel For="bornDate">Born date</FieldLabel>
+                <Addons>
+                    <Addon AddonType="AddonType.Body">
+                        <DatePicker @ref="@datePicker" @bind-Date="user.BornDate" />
+                    </Addon>
+                    <Addon AddonType="AddonType.End">
+                        <Button Color="Color.Primary" Clicked="@(() => datePicker.ToggleAsync())">
+                            <Icon Name="IconName.CalendarDay" />
+                        </Button>
+                    </Addon>
+                </Addons>
+            </Field>
+            <Field>
+                <FieldLabel For="gender">Gender</FieldLabel>
+                <Select @bind-SelectedValue="user.Gender" id="gender">
+                    @foreach (var item in Enum.GetValues(typeof(Enums.Gender)))
+                    {
+                        <SelectItem Value="@item">@(Enum.GetName(typeof(Enums.Gender), item))</SelectItem>
+                    }
+                </Select>
+            </Field>
+        </Fields>
+
+        <Fields>
+            <Field ColumnSize="ColumnSize.Is6">
+                <FieldLabel For="email">Email</FieldLabel>
+                <TextEdit Role="TextRole.Email" @bind-Text="user.Email" id="email" />
+            </Field>
+            <Field ColumnSize="ColumnSize.Is3">
+                <FieldLabel For="phone">Phone number</FieldLabel>
+                <InputMask @bind-Value="user.PhoneNumber"
+                           Mask="999-999-9999"
+                           AutoUnmask="true"
+                           id="phone">
+                    <FieldHelp>Example: 123-456-7890</FieldHelp>
+                </InputMask>
+            </Field>
+            <Field ColumnSize="ColumnSize.Is3">
+                <FieldLabel For="marital">Marital status</FieldLabel>
+                <Select @bind-SelectedValue="user.MaritalStatus" id="marital">
+                    @foreach (var item in Enum.GetValues(typeof(Enums.MaritalStatus)))
+                    {
+                        <SelectItem Value="@item">@(Enum.GetName(typeof(Enums.MaritalStatus), item))</SelectItem>
+                    }
+                </Select>
+            </Field>
+        </Fields>
+
+        <Field>
+            <InputFile OnChange="OnFileChange">
+                <FieldHelp>Only PNG images</FieldHelp>
+            </InputFile>
+        </Field>
+
+        <input type="submit" class="btn btn-primary" value="Save" />
+    </EditForm>
+</LoadingIndicator>
